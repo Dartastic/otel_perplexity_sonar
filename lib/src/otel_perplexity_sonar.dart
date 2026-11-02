@@ -1,15 +1,16 @@
-// Licensed under the Dartastic Pro Software License Agreement.
+// Licensed under the Apache License, Version 2.0
 // Copyright 2025-2026 Mindful Software LLC d/b/a Dartastic.io, All rights reserved.
 
-import 'package:dartastic_opentelemetry/dartastic_opentelemetry.dart';
+import 'package:dartastic_opentelemetry_api/dartastic_opentelemetry_api.dart';
 
 import 'otel_perplexity_sonar_suppression.dart';
 
 const _tracerName = 'dartastic_otel_libs_perplexity_sonar';
 
-Tracer _tracer() => OTel.tracerProvider().getTracer(_tracerName);
+APITracer _tracer() => OTelAPI.tracerProvider().getTracer(_tracerName);
 
 class PerplexitySonarResult {
+  /// Creates a result.
   const PerplexitySonarResult({
     this.requestId,
     this.researchJobId,
@@ -76,8 +77,13 @@ class PerplexitySonarResult {
   final int? statusCode;
 }
 
+/// What a traced call returned: the value for the caller plus fields
+/// recorded on the span.
 class PerplexitySonarCallResult<T> {
+  /// Creates a call result.
   const PerplexitySonarCallResult({required this.value, this.result});
+
+  /// The value returned to the caller.
   final T value;
   final PerplexitySonarResult? result;
 }
@@ -103,74 +109,74 @@ Future<T> tracedPerplexitySonar<T>({
   final span = _tracer().startSpan(
     'perplexity_sonar $operation',
     kind: SpanKind.client,
-    attributes: OTel.attributesFromMap(m),
+    attributes: OTelAPI.attributesFromMap(m),
   );
   try {
     final r = await invoke();
     if (r.result != null) {
       final extras = <Attribute<Object>>[];
       if (r.result!.requestId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'perplexity_sonar.request.id',
           r.result!.requestId!,
         ));
       }
       if (r.result!.researchJobId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'perplexity_sonar.research_job.id',
           r.result!.researchJobId!,
         ));
       }
       if (r.result!.searchMode != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'perplexity_sonar.search.mode',
           r.result!.searchMode!,
         ));
       }
       if (r.result!.recencyFilter != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'perplexity_sonar.recency.filter',
           r.result!.recencyFilter!,
         ));
       }
       if (r.result!.domainsAllowed != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'perplexity_sonar.domains.allowed',
           r.result!.domainsAllowed!,
         ));
       }
       if (r.result!.domainsBlocked != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'perplexity_sonar.domains.blocked',
           r.result!.domainsBlocked!,
         ));
       }
       if (r.result!.resultsReturned != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'perplexity_sonar.results.returned',
           r.result!.resultsReturned!,
         ));
       }
       if (r.result!.sourcesCount != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'perplexity_sonar.sources.count',
           r.result!.sourcesCount!,
         ));
       }
       if (r.result!.numSearchQueries != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'perplexity_sonar.search_queries.count',
           r.result!.numSearchQueries!,
         ));
       }
       if (r.result!.numReasoningSteps != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'perplexity_sonar.reasoning_steps.count',
           r.result!.numReasoningSteps!,
         ));
       }
       if (r.result!.researchStatus != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'perplexity_sonar.research.status',
           r.result!.researchStatus!,
         ));
@@ -183,31 +189,31 @@ Future<T> tracedPerplexitySonar<T>({
         }
       }
       if (r.result!.creditsUsed != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'perplexity_sonar.credits.used',
           r.result!.creditsUsed!,
         ));
       }
       if (r.result!.queryTokens != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'perplexity_sonar.tokens.query',
           r.result!.queryTokens!,
         ));
       }
       if (r.result!.contextTokens != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'perplexity_sonar.tokens.context',
           r.result!.contextTokens!,
         ));
       }
       if (r.result!.outputTokens != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'perplexity_sonar.tokens.output',
           r.result!.outputTokens!,
         ));
       }
       if (r.result!.statusCode != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'http.response.status_code',
           r.result!.statusCode!,
         ));
@@ -218,13 +224,13 @@ Future<T> tracedPerplexitySonar<T>({
           );
         }
       }
-      if (extras.isNotEmpty) span.addAttributes(OTel.attributes(extras));
+      if (extras.isNotEmpty) span.addAttributes(OTelAPI.attributes(extras));
     }
     return r.value;
   } catch (e, st) {
-    span.addAttributes(OTel.attributes([
-      OTel.attributeString(
-        ErrorResource.errorType.key,
+    span.addAttributes(OTelAPI.attributes([
+      OTelAPI.attributeString(
+        ErrorAttributes.errorType.key,
         e.runtimeType.toString(),
       ),
     ]));
